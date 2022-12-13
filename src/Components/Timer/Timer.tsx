@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Timer.css";
 import { Typography } from '@mui/material';
 import { Button } from '@mui/material';
@@ -8,35 +8,54 @@ export type TimerProps = {
 }
 
 const Timer = (props: TimerProps) => {
-    const [startTime, setStartTime] = useState(0);
-    const [stopTime, setStopTime] = useState(0);
-    const [isActive, setIsActive] = useState(false);
-    const [isPaused, setIsPaused] = useState(true);
+    const [time, setTime] = useState(0)
+    const [stopTime, setStopTime] = useState(0)
+    const [isActive, setIsActive] = useState(false)
 
-    const text = "hello";
-    let start;
+
+    useEffect(() => {
+        let interval: any = null
+
+        if (isActive) {
+            interval = setInterval(() => {
+                setTime((time) => time + 10);
+            }, 10)
+        } else {
+            clearInterval(interval)
+        }
+        return () => {
+            clearInterval(interval)
+        }
+    }, [isActive])
 
     const handleStart = () => {
-        setStartTime(Date.now())
+        setTime(Date.now())
+        setIsActive(true)
     }
 
     const handleStop = () => {
         setStopTime(Date.now())
     }
 
+    const handleReset = () => {
+        setIsActive(false)
+        setTime(0)
+        setStopTime(0)
+    }
+
     return (
         <>
             <Typography variant={"h2"}>
-                Start Time:
+                {/* Start Time:
                 {startTime}
                 Stop Time:
-                {stopTime}
+                {stopTime} */}
             </Typography>
             <Button variant={"contained"} onClick={handleStart}>
                 Start
             </Button>
-            <Button variant={"contained"} onClick={handleStop}>
-                Stop
+            <Button variant={"contained"} onClick={handleReset}>
+                Reset
             </Button>
         </>
     );
