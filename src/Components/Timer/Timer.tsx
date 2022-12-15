@@ -28,13 +28,8 @@ const Timer = (props: TimerProps) => {
         }
     }, [isActive])
 
-    const handleStart = () => {
-        setTime(Date.now())
-        setIsActive(true)
-    }
-
-    const handleStop = () => {
-        setStopTime(Date.now())
+    const handleStartStop = () => {
+        setIsActive(!isActive)
     }
 
     const handleReset = () => {
@@ -46,13 +41,18 @@ const Timer = (props: TimerProps) => {
     return (
         <>
             <Typography variant={"h2"}>
-                {/* Start Time:
-                {startTime}
-                Stop Time:
-                {stopTime} */}
+                <span className="digits">
+                    {("0" + Math.floor((time / 60000) % 60)).slice(-2)}:
+                </span>
+                <span className="digits">
+                    {("0" + Math.floor((time / 1000) % 60)).slice(-2)}.
+                </span>
+                <span className="digits mili-sec">
+                    {("0" + ((time / 10) % 100)).slice(-2)}
+                </span>
             </Typography>
-            <Button variant={"contained"} onClick={handleStart}>
-                Start
+            <Button variant={"contained"} onClick={handleStartStop}>
+                {isActive ? "Stop" : "Start"}
             </Button>
             <Button variant={"contained"} onClick={handleReset}>
                 Reset
