@@ -38,6 +38,20 @@ const Timer = (props: TimerProps) => {
         setStopTime(0)
     }
 
+    useEffect(() => {
+        const handleKeyPress = (event: KeyboardEvent) => {
+          if (event.code === 'Space') {
+            setIsActive((prevIsActive) => !prevIsActive);
+          }
+        };
+    
+        window.addEventListener('keydown', handleKeyPress);
+    
+        return () => {
+          window.removeEventListener('keydown', handleKeyPress);
+        };
+      }, []);
+
     return (
         <>
             <Typography variant={"h2"}>
