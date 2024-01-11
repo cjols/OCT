@@ -41,7 +41,7 @@ const Timer = (props: TimerProps) => {
     useEffect(() => {
         const handleKeyPress = (event: KeyboardEvent) => {
           if (event.code === 'Space') {
-            setIsActive((prevIsActive) => !prevIsActive);
+            handleStartStop()
           }
         };
     
@@ -52,18 +52,20 @@ const Timer = (props: TimerProps) => {
         };
       }, []);
 
+      const formatTime = (time: number): string => {
+        const minutes = Math.floor((time / 60000) % 60)
+        const seconds = Math.floor((time / 1000) % 60)
+        const mSeconds = Math.floor((time / 10) % 100)
+
+        return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(mSeconds).padStart(2, '0')}`
+      }
+
     return (
         <>
-            <Typography variant={"h2"}>
-                <span className="digits">
-                    {("0" + Math.floor((time / 60000) % 60)).slice(-2)}:
-                </span>
-                <span className="digits">
-                    {("0" + Math.floor((time / 1000) % 60)).slice(-2)}.
-                </span>
-                <span className="digits mili-sec">
-                    {("0" + ((time / 10) % 100)).slice(-2)}
-                </span>
+            <Typography variant={"h1"}>
+                <p>
+                    {formatTime(time)}
+                </p>
             </Typography>
             <Button variant={"contained"} onClick={handleStartStop}>
                 {isActive ? "Stop" : "Start"}
