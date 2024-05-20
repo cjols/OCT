@@ -63,16 +63,18 @@ const Timer = (props: TimerProps) => {
     return (
         <>
             <Typography variant={"h1"}>
-                <p>
+                <p className="timer">
                     {formatTime(time)}
                 </p>
             </Typography>
-            <Button variant={"contained"} onClick={handleStartStop}>
-                {isActive ? "Stop" : "Start"}
-            </Button>
-            <Button variant={"contained"} onClick={handleReset}>
-                Reset
-            </Button>
+            <div className="buttons">
+                <Button variant={"contained"} onClick={handleStartStop}>
+                    {isActive ? "Stop" : "Start"}
+                </Button>
+                <Button variant={"contained"} onClick={handleReset}>
+                    Reset
+                </Button>
+            </div>
         </>
     );
 };
