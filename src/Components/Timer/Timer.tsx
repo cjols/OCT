@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import "./Timer.css";
 import { Typography } from '@mui/material';
 import { Button } from '@mui/material';
@@ -28,9 +28,9 @@ const Timer = (props: TimerProps) => {
         }
     }, [isActive])
 
-    const handleStartStop = () => {
-        setIsActive(!isActive)
-    }
+    const handleStartStop = useCallback(() => {
+        setIsActive((isActive) => !isActive)
+    }, []);
 
     const handleReset = () => {
         setIsActive(false)
