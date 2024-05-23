@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import "./Timer.css";
 import { Typography } from '@mui/material';
 import { Button } from '@mui/material';
@@ -9,22 +9,24 @@ export type TimerProps = {
 
 const Timer = (props: TimerProps) => {
     const [time, setTime] = useState(0)
-    const [stopTime, setStopTime] = useState(0)
     const [isActive, setIsActive] = useState(false)
-
+    const timerRef = useRef<NodeJS.Timeout | null>(null)
 
     useEffect(() => {
-        let interval: any = null
-
         if (isActive) {
-            interval = setInterval(() => {
+            timerRef.current = setInterval(() => {
                 setTime((time) => time + 10);
             }, 10)
         } else {
-            clearInterval(interval)
+            if (timerRef.current) {
+                clearInterval(timerRef.current)
+                timerRef.current = null
+            }
         }
         return () => {
-            clearInterval(interval)
+            if (timerRef.current) {
+                clearInterval(timerRef.current)
+            }
         }
     }, [isActive])
 
@@ -35,7 +37,6 @@ const Timer = (props: TimerProps) => {
     const handleReset = () => {
         setIsActive(false)
         setTime(0)
-        setStopTime(0)
     }
 
     useEffect(() => {
