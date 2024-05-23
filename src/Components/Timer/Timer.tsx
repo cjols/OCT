@@ -10,7 +10,9 @@ export type TimerProps = {
 const Timer = (props: TimerProps) => {
     const [time, setTime] = useState(0)
     const [isActive, setIsActive] = useState(false)
+    const [isHolding, setIsHolding] = useState(false)
     const timerRef = useRef<NodeJS.Timeout | null>(null)
+    const holdTimerRef = useRef<NodeJS.Timeout | null>(null)
 
     useEffect(() => {
         if (isActive) {
@@ -39,19 +41,50 @@ const Timer = (props: TimerProps) => {
         setTime(0)
     }
 
+    const handleKeyDown = useCallback((event: KeyboardEvent) => {
+        if (event.code === 'Space' && !isHolding) {
+            setIsHolding(true)
+            holdTimerRef.current = setTimeout(() => {
+                holdTimerRef.current = null
+            }, 1000)
+        }
+    }, [isHolding])
+
+    const handleKeyUp = useCallback((event: KeyboardEvent) => {
+        if (event.code === 'Space' && isHolding) {
+            setIsHolding(false)
+            if (holdTimerRef.current === null) {
+                handleStartStop()
+            } else {
+                clearTimeout(holdTimerRef.current!)
+                holdTimerRef.current = null
+            }
+        }
+    }, [isHolding, handleStartStop])
+
     useEffect(() => {
-        const handleKeyPress = (event: KeyboardEvent) => {
-          if (event.code === 'Space') {
-            handleStartStop()
-          }
-        };
-    
-        window.addEventListener('keydown', handleKeyPress);
-    
+        window.addEventListener('keydown', handleKeyDown)
+        window.addEventListener('keyup', handleKeyUp)
+
         return () => {
-          window.removeEventListener('keydown', handleKeyPress);
-        };
-      }, []);
+            window.removeEventListener('keydown', handleKeyDown)
+            window.removeEventListener('keyup', handleKeyUp)
+        }
+    }, [handleKeyDown, handleKeyUp])
+
+    // useEffect(() => {
+    //     const handleKeyPress = (event: KeyboardEvent) => {
+    //       if (event.code === 'Space') {
+    //         handleStartStop()
+    //       }
+    //     };
+    
+    //     window.addEventListener('keydown', handleKeyPress);
+    
+    //     return () => {
+    //       window.removeEventListener('keydown', handleKeyPress);
+    //     };
+    //   }, []);
 
       const formatTime = (time: number): string => {
         const minutes = Math.floor((time / 60000) % 60)
