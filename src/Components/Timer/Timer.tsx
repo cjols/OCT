@@ -34,7 +34,7 @@ const Timer = (props: TimerProps) => {
 
     const handleStartStop = useCallback(() => {
         setIsActive((isActive) => !isActive)
-    }, []);
+    }, [isActive]);
 
     const handleReset = () => {
         setIsActive(false)
@@ -42,22 +42,27 @@ const Timer = (props: TimerProps) => {
     }
 
     const handleKeyDown = useCallback((event: KeyboardEvent) => {
-        if (event.code === 'Space' && !isHolding) {
-            setIsHolding(true)
-            holdTimerRef.current = setTimeout(() => {
-                holdTimerRef.current = null
-            }, 1000)
+        if (event.code === 'Space') {
+            if (isActive) {
+                handleStartStop()
+            } else if (!isHolding) {
+                setTime(0)
+                setIsHolding(true)
+                holdTimerRef.current = setTimeout(() => {
+                    holdTimerRef.current = null
+                }, 1000)
+            }
         }
-    }, [isHolding])
+    }, [isHolding, handleStartStop])
 
     const handleKeyUp = useCallback((event: KeyboardEvent) => {
         if (event.code === 'Space' && isHolding) {
             setIsHolding(false)
-            if (holdTimerRef.current === null) {
-                handleStartStop()
-            } else {
+            if (holdTimerRef.current) {
                 clearTimeout(holdTimerRef.current!)
                 holdTimerRef.current = null
+            } else {
+                handleStartStop()
             }
         }
     }, [isHolding, handleStartStop])
@@ -71,20 +76,6 @@ const Timer = (props: TimerProps) => {
             window.removeEventListener('keyup', handleKeyUp)
         }
     }, [handleKeyDown, handleKeyUp])
-
-    // useEffect(() => {
-    //     const handleKeyPress = (event: KeyboardEvent) => {
-    //       if (event.code === 'Space') {
-    //         handleStartStop()
-    //       }
-    //     };
-    
-    //     window.addEventListener('keydown', handleKeyPress);
-    
-    //     return () => {
-    //       window.removeEventListener('keydown', handleKeyPress);
-    //     };
-    //   }, []);
 
       const formatTime = (time: number): string => {
         const minutes = Math.floor((time / 60000) % 60)
