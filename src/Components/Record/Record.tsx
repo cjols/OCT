@@ -1,4 +1,5 @@
 import React from 'react'
+import "./Record.css"
 
 interface RecordProps {
     recordedTimes: number[]
