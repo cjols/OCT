@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import "./Timer.css";
 import { Typography } from '@mui/material';
-import { Button } from '@mui/material';
 
 export type TimerProps = {
     
@@ -35,11 +34,6 @@ const Timer = (props: TimerProps) => {
         setTime(Math.floor(elapsedTimeRef.current))
         requestRef.current = requestAnimationFrame(updateTimer)
     }, [])
-
-    const handleReset = () => {
-        setIsActive(false)
-        setTime(0)
-    }
 
     const handleKeyDown = useCallback((event: KeyboardEvent) => {
         if (event.code === 'Space') {
@@ -107,17 +101,6 @@ const Timer = (props: TimerProps) => {
                     {formatTime(time)}
                 </p>
             </Typography>
-            <div className="buttons">
-                <Button variant={"contained"} onClick={startTimer}>
-                    {"Start"}
-                </Button>
-                <Button variant={"contained"} onClick={stopTimer}>
-                    {"Stop"}
-                </Button>
-                <Button variant={"contained"} onClick={handleReset}>
-                    Reset
-                </Button>
-            </div>
         </>
     );
 };
