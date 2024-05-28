@@ -9,11 +9,11 @@ const Record: React.FC<RecordProps> = ({ recordedTimes }) => {
     return (
         <div>
             <h2>Recorded Times:</h2>
-            <ul>
+            <ol>
                 {recordedTimes.map((recordedTime, index) => (
-                    <li key={index}>{recordedTime}s</li>
+                    <li key={index}>{recordedTime}</li>
                 ))}
-            </ul>
+            </ol>
         </div>
     )
 }

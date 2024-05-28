@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import "./Timer.css";
 import { Typography } from '@mui/material';
+import Record from "../Record/Record";
 
 export type TimerProps = {
     
@@ -10,6 +11,7 @@ const Timer = (props: TimerProps) => {
     const [time, setTime] = useState(0)
     const [isActive, setIsActive] = useState(false)
     const [isHolding, setIsHolding] = useState(false)
+    const [recordedTimes, setRecordedTimes] = useState<number[]>([])
 
     const holdTimerRef = useRef<NodeJS.Timeout | null>(null)
     const startTimeRef = useRef<number>(0)
@@ -27,6 +29,8 @@ const Timer = (props: TimerProps) => {
             cancelAnimationFrame(requestRef.current)
             requestRef.current = null
         }
+        const formattedTime = Math.trunc(elapsedTimeRef.current / 10)/100
+        setRecordedTimes((prevTimes) => [...prevTimes, formattedTime])
     }, [])
 
     const updateTimer = useCallback(() => {
@@ -101,6 +105,7 @@ const Timer = (props: TimerProps) => {
                     {formatTime(time)}
                 </p>
             </Typography>
+            <Record recordedTimes={recordedTimes} />
         </>
     );
 };
