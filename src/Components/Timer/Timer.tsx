@@ -17,24 +17,6 @@ const Timer = (props: TimerProps) => {
     const elapsedTimeRef = useRef<number>(0)
     const requestRef = useRef<number | null>(null)
 
-    // useEffect(() => {
-    //     if (isActive) {
-    //         timerRef.current = setInterval(() => {
-    //             setTime((time) => time + 10);
-    //         }, 10)
-    //     } else {
-    //         if (timerRef.current) {
-    //             clearInterval(timerRef.current)
-    //             timerRef.current = null
-    //         }
-    //     }
-    //     return () => {
-    //         if (timerRef.current) {
-    //             clearInterval(timerRef.current)
-    //         }
-    //     }
-    // }, [isActive])
-
     const startTimer = useCallback(() => {
         startTimeRef.current = performance.now() - elapsedTimeRef.current
         setIsActive(true)
@@ -53,10 +35,6 @@ const Timer = (props: TimerProps) => {
         setTime(Math.floor(elapsedTimeRef.current))
         requestRef.current = requestAnimationFrame(updateTimer)
     }, [])
-
-    // const handleStartStop = useCallback(() => {
-    //     setIsActive((isActive) => !isActive)
-    // }, [isActive]);
 
     const handleReset = () => {
         setIsActive(false)
