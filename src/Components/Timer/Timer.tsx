@@ -10,48 +10,87 @@ export type TimerProps = {
 const Timer = (props: TimerProps) => {
     const [time, setTime] = useState(0)
     const [isActive, setIsActive] = useState(false)
-    const timerRef = useRef<NodeJS.Timeout | null>(null)
+    const [isHolding, setIsHolding] = useState(false)
 
-    useEffect(() => {
-        if (isActive) {
-            timerRef.current = setInterval(() => {
-                setTime((time) => time + 10);
-            }, 10)
-        } else {
-            if (timerRef.current) {
-                clearInterval(timerRef.current)
-                timerRef.current = null
-            }
-        }
-        return () => {
-            if (timerRef.current) {
-                clearInterval(timerRef.current)
-            }
-        }
-    }, [isActive])
+    const holdTimerRef = useRef<NodeJS.Timeout | null>(null)
+    const startTimeRef = useRef<number>(0)
+    const elapsedTimeRef = useRef<number>(0)
+    const requestRef = useRef<number | null>(null)
 
-    const handleStartStop = useCallback(() => {
-        setIsActive((isActive) => !isActive)
-    }, []);
+    const startTimer = useCallback(() => {
+        startTimeRef.current = performance.now() - elapsedTimeRef.current
+        setIsActive(true)
+    }, [])
+
+    const stopTimer = useCallback(() => {
+        setIsActive(false)
+        if (requestRef.current) {
+            cancelAnimationFrame(requestRef.current)
+            requestRef.current = null
+        }
+    }, [])
+
+    const updateTimer = useCallback(() => {
+        elapsedTimeRef.current = performance.now() - startTimeRef.current
+        setTime(Math.floor(elapsedTimeRef.current))
+        requestRef.current = requestAnimationFrame(updateTimer)
+    }, [])
 
     const handleReset = () => {
         setIsActive(false)
         setTime(0)
     }
 
-    useEffect(() => {
-        const handleKeyPress = (event: KeyboardEvent) => {
-          if (event.code === 'Space') {
-            handleStartStop()
-          }
-        };
-    
-        window.addEventListener('keydown', handleKeyPress);
-    
+    const handleKeyDown = useCallback((event: KeyboardEvent) => {
+        if (event.code === 'Space') {
+            if (isActive) {
+                stopTimer()
+            } else if (!isHolding) {
+                setTime(0)
+                setIsHolding(true)
+                holdTimerRef.current = setTimeout(() => {
+                    // startTimer()    // ???
+                    holdTimerRef.current = null
+                }, 1000)
+            }
+        }
+    }, [isActive, isHolding, stopTimer])
+
+    const handleKeyUp = useCallback((event: KeyboardEvent) => {
+        if (event.code === 'Space' && isHolding) {
+            setIsHolding(false)
+            if (holdTimerRef.current) {
+                clearTimeout(holdTimerRef.current!)
+                holdTimerRef.current = null
+            } else {
+                startTimer()
+            }
+        }
+    }, [isHolding, startTimer])
+
+    useEffect (() => {
+        if (isActive) {
+            requestRef.current = requestAnimationFrame(updateTimer)
+        } else {
+            elapsedTimeRef.current = 0
+        }
+
         return () => {
-          window.removeEventListener('keydown', handleKeyPress);
-        };
-      }, []);
+            if (requestRef.current) {
+                cancelAnimationFrame(requestRef.current)
+            }
+        }
+    }, [isActive, updateTimer])
+
+    useEffect(() => {
+        window.addEventListener('keydown', handleKeyDown)
+        window.addEventListener('keyup', handleKeyUp)
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown)
+            window.removeEventListener('keyup', handleKeyUp)
+        }
+    }, [handleKeyDown, handleKeyUp])
 
       const formatTime = (time: number): string => {
         const minutes = Math.floor((time / 60000) % 60)
@@ -69,8 +108,11 @@ const Timer = (props: TimerProps) => {
                 </p>
             </Typography>
             <div className="buttons">
-                <Button variant={"contained"} onClick={handleStartStop}>
-                    {isActive ? "Stop" : "Start"}
+                <Button variant={"contained"} onClick={startTimer}>
+                    {"Start"}
+                </Button>
+                <Button variant={"contained"} onClick={stopTimer}>
+                    {"Stop"}
                 </Button>
                 <Button variant={"contained"} onClick={handleReset}>
                     Reset
